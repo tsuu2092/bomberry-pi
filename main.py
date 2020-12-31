@@ -102,9 +102,9 @@ class Explosion(Transform):
 sense = SenseHat()
 sense.clear()
 
-player_color = (255, 0, 0)
-bomb_color = (0, 255, 0)
-explosion_color = (0, 0, 255)
+player_color = (0, 255, 0)
+bomb_color = (255, 0, 0)
+explosion_color = (255, 0, 255)
 player = Player()
 
 
