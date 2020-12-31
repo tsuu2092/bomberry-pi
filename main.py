@@ -10,33 +10,28 @@ def valid_position_index(n):
     return 0 <= n <= 7
 
 
+def get_exploded_tiles(x, y, length):
+    tiles = []
+    for i in range(-length, length + 1):
+        if valid_position_index(y + i):
+            tiles.append((x, y + i))
+    for i in range(-length, length + 1):
+        if valid_position_index(x + i):
+            tiles.append((x + i, y))
+    return set(tiles)
+
+
 class Explosion:
     def __init__(self, x, y, player, length=2, lifetime=0.1):
-        self.x = x
-        self.y = y
         self.player = player
-        self.length = length
         self.end_time = time.time() + lifetime
-        self.exploded_tiles = self.get_exploded_tiles()
+        self.exploded_tiles = get_exploded_tiles(x, y, length)
 
     def should_end(self):
         return time.time() > self.end_time
 
     def end(self):
         player.explosions.remove(self)
-
-    def get_exploded_tiles(self):
-        tiles = []
-        x = self.x
-        y = self.y
-        length = self.length
-        for i in range(-length, length + 1):
-            if valid_position_index(y + i):
-                tiles.append((x, y + i))
-        for i in range(-length, length + 1):
-            if valid_position_index(x + i):
-                tiles.append((x + i, y))
-        return set(tiles)
 
 
 class Player:
