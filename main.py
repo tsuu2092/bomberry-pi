@@ -138,9 +138,8 @@ def render_bombs():
 
 
 def render_explosion():
-    for explosion in player.explosions:
-        for x, y in explosion.get_exploded_tiles():
-            sense.set_pixel(x, y, explosion_color)
+    for x, y in player.get_exploded_tiles():
+        sense.set_pixel(x, y, explosion_color)
 
 
 def update():
