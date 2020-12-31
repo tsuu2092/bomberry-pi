@@ -10,6 +10,10 @@ class Bomb:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.explode_time = time.time() + 1
+
+    def explode(self):
+        pass
 
 
 class Player:
@@ -26,6 +30,13 @@ class Player:
     def place_bomb(self):
         self.bombs.append(Bomb(self.x, self.y))
         pass
+
+    def handle_bomb_explosion(self):
+        bombs = self.bombs[:]
+        for bomb in bombs:
+            if time.time() > bomb.explode_time:
+                bomb.explode()
+                self.bombs.remove(bomb)
 
 
 sense = SenseHat()
@@ -73,6 +84,7 @@ def render_bombs():
 def update():
     sense.clear()
     render_player()
+    player.handle_bomb_explosion()
     render_bombs()
 
 
