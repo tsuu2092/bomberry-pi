@@ -36,7 +36,7 @@ class Explosion:
         for i in range(-length, length + 1):
             if valid_position_index(x + i):
                 tiles.append((x + i, y))
-        return list(set(tiles))
+        return set(tiles)
 
 
 class Player:
