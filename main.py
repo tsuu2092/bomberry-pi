@@ -17,6 +17,7 @@ class Explosion:
         self.player = player
         self.length = length
         self.end_time = time.time() + lifetime
+        self.exploded_tiles = self.get_exploded_tiles()
 
     def should_end(self):
         return time.time() > self.end_time
@@ -61,15 +62,15 @@ class Player:
             if bomb.should_explode():
                 self.explosions.append(bomb.explode())
 
-    def get_exploding_tiles(self):
-        return set((x, y) for explosion in self.explosions for x, y in explosion.get_exploded_tiles())
+    def get_exploded_tiles(self):
+        return set((x, y) for explosion in self.explosions for x, y in explosion.exploded_tiles)
 
     def handle_explosion(self):
         explosions = self.explosions[:]
         for explosion in explosions:
             if explosion.should_end():
                 explosion.end()
-        exploding_tiles = self.get_exploding_tiles()
+        exploding_tiles = self.get_exploded_tiles()
         for x, y in exploding_tiles:
             for bomb in self.bombs:
                 if x == bomb.x and y == bomb.y:
