@@ -47,27 +47,22 @@ class Player(Transform):
             if bomb.should_explode():
                 bomb.explode()
 
-    def get_exploded_tiles(self):
-        return set((x, y) for explosion in self.explosions for x, y in explosion.exploded_tiles)
-
-    def handle_explosion(self):
+    def handle_explosions(self):
         explosions = self.explosions[:]
         for explosion in explosions:
             if explosion.should_end():
                 explosion.end()
-        exploding_tiles = self.get_exploded_tiles()
-        for x, y in exploding_tiles:
             for bomb in self.bombs:
-                if x == bomb.x and y == bomb.y:
+                if explosion.is_collided_with(bomb):
                     bomb.is_triggered = True
-                    continue
 
 
 class Bomb(Transform):
-    def __init__(self, x, y, player, lifetime=2):
+    def __init__(self, x, y, player, lifetime=2, length=2, ):
         super().__init__(x, y)
         self.player = player
         self.is_triggered = False
+        self.length = length
         self.explode_time = time.time() + lifetime
 
     def should_explode(self):
@@ -75,25 +70,27 @@ class Bomb(Transform):
 
     def explode(self):
         player.bombs.remove(self)
-        player.explosions.append(Explosion(self.x, self.y, self.player))
+        player.explosions.extend(self.get_explosions())
+
+    def get_explosions(self):
+        tiles = []
+        x = self.x
+        y = self.y
+        length = self.length
+        for i in range(-length, length + 1):
+            if valid_position_index(y + i):
+                tiles.append((x, y + i))
+        for i in range(-length, length + 1):
+            if valid_position_index(x + i):
+                tiles.append((x + i, y))
+        return [Explosion(tile[0], tile[1], self.player) for tile in set(tiles)]
 
 
-def get_exploded_tiles(x, y, length):
-    tiles = []
-    for i in range(-length, length + 1):
-        if valid_position_index(y + i):
-            tiles.append((x, y + i))
-    for i in range(-length, length + 1):
-        if valid_position_index(x + i):
-            tiles.append((x + i, y))
-    return set(tiles)
-
-
-class Explosion:
-    def __init__(self, x, y, player, length=2, lifetime=0.1):
+class Explosion(Transform):
+    def __init__(self, x, y, player, lifetime=0.1):
+        super().__init__(x, y)
         self.player = player
         self.end_time = time.time() + lifetime
-        self.exploded_tiles = get_exploded_tiles(x, y, length)
 
     def should_end(self):
         return time.time() > self.end_time
@@ -145,9 +142,9 @@ def render_bombs():
         sense.set_pixel(bomb.x, bomb.y, bomb_color)
 
 
-def render_explosion():
-    for x, y in player.get_exploded_tiles():
-        sense.set_pixel(x, y, explosion_color)
+def render_explosions():
+    for explosion in player.explosions:
+        sense.set_pixel(explosion.x, explosion.y, explosion_color)
 
 
 def update():
@@ -155,8 +152,8 @@ def update():
     render_player()
     player.handle_bombs()
     render_bombs()
-    player.handle_explosion()
-    render_explosion()
+    player.handle_explosions()
+    render_explosions()
 
 
 sense.stick.direction_up = move_up
