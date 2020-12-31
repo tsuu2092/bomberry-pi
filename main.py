@@ -13,16 +13,6 @@ class Explosion:
         self.length = length
 
 
-class Bomb:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.explode_time = time.time() + 1
-
-    def explode(self):
-        pass
-
-
 class Player:
     def __init__(self):
         self.x = 0
@@ -35,16 +25,29 @@ class Player:
         self.y = clamp(self.y + y)
 
     def place_bomb(self):
-        self.bombs.append(Bomb(self.x, self.y))
+        self.bombs.append(Bomb(self.x, self.y, self.bombs))
         pass
 
     def handle_bomb_explosion(self):
         bombs = self.bombs[:]
-        current_time = time.time()
         for bomb in bombs:
-            if current_time > bomb.explode_time:
+            if bomb.should_explode():
                 bomb.explode()
-                self.bombs.remove(bomb)
+
+
+class Bomb:
+    def __init__(self, x, y, bombs: list, lifetime=2):
+        self.x = x
+        self.y = y
+        self.bombs = bombs
+        self.explode_time = time.time() + lifetime
+
+    def should_explode(self):
+        return time.time() > self.explode_time
+
+    def explode(self):
+        self.bombs.remove(self)
+        pass
 
 
 sense = SenseHat()
