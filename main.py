@@ -6,6 +6,13 @@ def clamp(n, _min=0, _max=7):
     return max(_min, min(n, _max))
 
 
+class Explosion:
+    def __init__(self, x, y, length=1):
+        self.x = x
+        self.y = y
+        self.length = length
+
+
 class Bomb:
     def __init__(self, x, y):
         self.x = x
@@ -33,8 +40,9 @@ class Player:
 
     def handle_bomb_explosion(self):
         bombs = self.bombs[:]
+        current_time = time.time()
         for bomb in bombs:
-            if time.time() > bomb.explode_time:
+            if current_time > bomb.explode_time:
                 bomb.explode()
                 self.bombs.remove(bomb)
 
