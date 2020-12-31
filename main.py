@@ -10,6 +10,74 @@ def valid_position_index(n):
     return 0 <= n <= 7
 
 
+class Transform:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def get_position(self):
+        return self.x, self.y
+
+    def is_collided_with(self, transform):
+        return self.get_position() == transform.get_position()
+
+
+class Player(Transform):
+    def __init__(self, _id=200, x=0, y=0):
+        super().__init__(x, y)
+        self._id = _id
+        self.bombs = []
+        self.explosions = []
+        self.is_dead = False
+
+    def move(self, x, y):
+        self.x = clamp(self.x + x)
+        self.y = clamp(self.y + y)
+
+    def place_bomb(self):
+        for bomb in self.bombs:
+            if self.is_collided_with(bomb):
+                return
+        self.bombs.append(Bomb(self.x, self.y, self))
+        pass
+
+    def handle_bombs(self):
+        bombs = self.bombs[:]
+        for bomb in bombs:
+            if bomb.should_explode():
+                bomb.explode()
+
+    def get_exploded_tiles(self):
+        return set((x, y) for explosion in self.explosions for x, y in explosion.exploded_tiles)
+
+    def handle_explosion(self):
+        explosions = self.explosions[:]
+        for explosion in explosions:
+            if explosion.should_end():
+                explosion.end()
+        exploding_tiles = self.get_exploded_tiles()
+        for x, y in exploding_tiles:
+            for bomb in self.bombs:
+                if x == bomb.x and y == bomb.y:
+                    bomb.is_triggered = True
+                    continue
+
+
+class Bomb(Transform):
+    def __init__(self, x, y, player, lifetime=2):
+        super().__init__(x, y)
+        self.player = player
+        self.is_triggered = False
+        self.explode_time = time.time() + lifetime
+
+    def should_explode(self):
+        return self.is_triggered or time.time() > self.explode_time
+
+    def explode(self):
+        player.bombs.remove(self)
+        player.explosions.append(Explosion(self.x, self.y, self.player))
+
+
 def get_exploded_tiles(x, y, length):
     tiles = []
     for i in range(-length, length + 1):
@@ -32,61 +100,6 @@ class Explosion:
 
     def end(self):
         player.explosions.remove(self)
-
-
-class Player:
-    def __init__(self):
-        self.id = 200
-        self.x = 0
-        self.y = 0
-        self.bombs = []
-        self.explosions = []
-        self.is_dead = False
-
-    def move(self, x, y):
-        self.x = clamp(self.x + x)
-        self.y = clamp(self.y + y)
-
-    def place_bomb(self):
-        self.bombs.append(Bomb(self.x, self.y, self))
-        pass
-
-    def handle_bombs(self):
-        bombs = self.bombs[:]
-        for bomb in bombs:
-            if bomb.should_explode():
-                self.explosions.append(bomb.explode())
-
-    def get_exploded_tiles(self):
-        return set((x, y) for explosion in self.explosions for x, y in explosion.exploded_tiles)
-
-    def handle_explosion(self):
-        explosions = self.explosions[:]
-        for explosion in explosions:
-            if explosion.should_end():
-                explosion.end()
-        exploding_tiles = self.get_exploded_tiles()
-        for x, y in exploding_tiles:
-            for bomb in self.bombs:
-                if x == bomb.x and y == bomb.y:
-                    bomb.is_triggered = True
-                    continue
-
-
-class Bomb:
-    def __init__(self, x, y, player, lifetime=2):
-        self.x = x
-        self.y = y
-        self.player = player
-        self.is_triggered = False
-        self.explode_time = time.time() + lifetime
-
-    def should_explode(self):
-        return self.is_triggered or time.time() > self.explode_time
-
-    def explode(self):
-        player.bombs.remove(self)
-        return Explosion(self.x, self.y, player)
 
 
 sense = SenseHat()
