@@ -104,9 +104,8 @@ sense = SenseHat()
 sense.clear()
 
 
-
 player = Player()
-
+players = [player]
 
 def move_up(event):
     if event.action == ACTION_PRESSED:
@@ -133,8 +132,9 @@ def place_bomb(event):
         player.place_bomb()
 
 
-def render_player():
-    sense.set_pixel(player.x, player.y, player.color)
+def render_players():
+    for player in players:
+        sense.set_pixel(player.x, player.y, player.color)
 
 
 def render_bombs():
@@ -149,7 +149,7 @@ def render_explosions():
 
 def update():
     sense.clear()
-    render_player()
+    render_players()
     player.handle_bombs()
     render_bombs()
     player.handle_explosions()
