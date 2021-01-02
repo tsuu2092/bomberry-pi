@@ -14,6 +14,7 @@ class Map(SenseHat):
         super().__init__()
         self.bombs = []
         self.explosions = []
+        self.players = []
 
     def handle_bombs(self):
         for bomb in self.bombs:
@@ -53,6 +54,7 @@ class Player(Transform):
         super().__init__(map, x, y, color)
         self._id = _id
         self.is_dead = False
+        self.map.players.append(self)
 
     def move(self, x, y):
         self.x = clamp(self.x + x)
@@ -107,10 +109,9 @@ class Explosion(Transform):
 sense = Map()
 sense.clear()
 
-
 player = Player(sense)
 virtual_player = Player(sense, 300, 7, 7, (255,255,0))
-players = [player, virtual_player]
+
 
 def move_up(event):
     if event.action == ACTION_PRESSED:
@@ -138,7 +139,7 @@ def place_bomb(event):
 
 
 def render_players():
-    for player in players:
+    for player in sense.players:
         player.render()
 
 
