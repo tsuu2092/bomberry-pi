@@ -29,9 +29,14 @@ class Map(SenseHat):
             for bomb in self.bombs:
                 if explosion.is_collided_with(bomb):
                     bomb.is_triggered = True
+    def render(self):
+        for player in self.players:
+            player.render()
+        for bomb in self.bombs:
+            bomb.render()
+        for explosion in self.explosions:
+            explosion.render()
     
-
-
 class Transform:
     def __init__(self, map, x, y, color):
         self.x = x
@@ -138,28 +143,13 @@ def place_bomb(event):
         player.place_bomb()
 
 
-def render_players():
-    for player in sense.players:
-        player.render()
-
-
-def render_bombs():
-    for bomb in sense.bombs:
-        bomb.render()
-
-
-def render_explosions():
-    for explosion in sense.explosions:
-        explosion.render()
 
 
 def update():
     sense.clear()
-    render_players()
     sense.handle_bombs()
-    render_bombs()
     sense.handle_explosions()
-    render_explosions()
+    sense.render()
 
 
 sense.stick.direction_up = move_up
