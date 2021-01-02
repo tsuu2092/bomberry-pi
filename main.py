@@ -10,6 +10,59 @@ def valid_position_index(n):
     return 0 <= n <= 7
 
 
+class Map():
+    player_color = (0, 125, 0)
+    player_bomb_color = (0, 255, 255)
+    player_explosion_color = (0, 0, 255)
+    enemy_color = (125, 0, 0)
+    enemy_bomb_color = (255, 0, 0)
+    enemy_explosion_color = (255, 255, 0)
+
+    def __init__(self, sense, player, enemy):
+        self.is_playing = True
+        self.sense = sense
+        self.player = player
+        self.enemy = enemy
+        self.enemy.place_bomb()
+        self.clear()
+
+    def clear(self):
+        self.sense.clear()
+
+    def render(self, color, *transforms):
+        for transform in transforms:
+            self.sense.set_pixel(transform.x, transform.y, color)
+
+    def render_all(self):
+        self.clear()
+        self.render(self.__class__.player_color, self.player)
+        self.render(self.__class__.player_bomb_color, *self.player.bombs)
+        self.render(self.__class__.player_explosion_color, *self.player.explosions)
+        self.render(self.__class__.enemy_color, self.enemy)
+        self.render(self.__class__.enemy_bomb_color, *self.enemy.bombs)
+        self.render(self.__class__.enemy_explosion_color, *self.enemy.explosions)
+
+    def handle_all(self):
+        self.player.handle_bombs()
+        self.enemy.handle_bombs()
+        self.player.handle_explosions()
+        self.enemy.handle_explosions()
+        self.player.invalid_positions = self.enemy.get_collider_positions()
+        self.player.dead_positions = self.enemy.get_explosion_positions()
+        self.enemy.invalid_positions = self.player.get_collider_positions()
+        self.enemy.dead_positions = self.player.get_explosion_positions()
+        if self.player.is_hit():
+            self.sense.show_message("You lose")
+            return
+        if self.enemy.is_hit():
+            self.sense.show_message("You win")
+            return
+
+    def update(self):
+        self.handle_all()
+        self.render_all()
+
+
 class Transform:
     def __init__(self, x, y):
         self.x = x
@@ -28,11 +81,23 @@ class Player(Transform):
         self._id = _id
         self.bombs = []
         self.explosions = []
-        self.is_dead = False
+        self.invalid_positions = []
+        self.dead_positions = []
+
+    def get_collider_positions(self):
+        return set([self.get_position()] + [bomb.get_position() for bomb in self.bombs])
+
+    def get_explosion_positions(self):
+        return set(explosion.get_position() for explosion in self.explosions)
+
+    def is_hit(self):
+        return self.get_position() in self.dead_positions
 
     def move(self, x, y):
-        self.x = clamp(self.x + x)
-        self.y = clamp(self.y + y)
+        next_position = clamp(self.x + x), clamp(self.y + y)
+        if next_position in self.invalid_positions:
+            return
+        self.x, self.y = next_position
 
     def place_bomb(self):
         for bomb in self.bombs:
@@ -69,8 +134,8 @@ class Bomb(Transform):
         return self.is_triggered or time.time() > self.explode_time
 
     def explode(self):
-        player.bombs.remove(self)
-        player.explosions.extend(self.get_explosions())
+        self.player.bombs.remove(self)
+        self.player.explosions.extend(self.get_explosions())
 
     def get_explosions(self):
         tiles = []
@@ -96,16 +161,15 @@ class Explosion(Transform):
         return time.time() > self.end_time
 
     def end(self):
-        player.explosions.remove(self)
+        self.player.explosions.remove(self)
 
 
 sense = SenseHat()
 sense.clear()
 
-player_color = (0, 255, 0)
-bomb_color = (255, 0, 0)
-explosion_color = (255, 0, 255)
 player = Player()
+enemy = Player(300, 2, 2)
+_map = Map(sense, player, enemy)
 
 
 def move_up(event):
@@ -133,33 +197,11 @@ def place_bomb(event):
         player.place_bomb()
 
 
-def render_player():
-    sense.set_pixel(player.x, player.y, player_color)
-
-
-def render_bombs():
-    for bomb in player.bombs:
-        sense.set_pixel(bomb.x, bomb.y, bomb_color)
-
-
-def render_explosions():
-    for explosion in player.explosions:
-        sense.set_pixel(explosion.x, explosion.y, explosion_color)
-
-
-def update():
-    sense.clear()
-    render_player()
-    player.handle_bombs()
-    render_bombs()
-    player.handle_explosions()
-    render_explosions()
-
-
 sense.stick.direction_up = move_up
 sense.stick.direction_down = move_down
 sense.stick.direction_left = move_left
 sense.stick.direction_right = move_right
 sense.stick.direction_middle = place_bomb
+
 while True:
-    update()
+    _map.update()
