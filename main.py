@@ -21,9 +21,6 @@ class Transform:
 
     def is_collided_with(self, transform):
         return self.get_position() == transform.get_position()
-    
-    def render(self):
-        sense.set_pixel(self.x, self.y, self.color)
 
 
 class Player(Transform):
@@ -138,17 +135,17 @@ def place_bomb(event):
 
 def render_players():
     for player in players:
-        player.render()
+        sense.set_pixel(player.x, player.y, player.color)
 
 
 def render_bombs():
     for bomb in player.bombs:
-        bomb.render()
+        sense.set_pixel(bomb.x, bomb.y, bomb.color)
 
 
 def render_explosions():
     for explosion in player.explosions:
-        explosion.render()
+        sense.set_pixel(explosion.x, explosion.y, explosion.color)
 
 
 def update():
