@@ -105,8 +105,7 @@ sense.clear()
 
 
 player = Player()
-virtual_player = Player(300, 7, 7, (255,255,0))
-players = [player, virtual_player]
+players = [player]
 
 def move_up(event):
     if event.action == ACTION_PRESSED:
