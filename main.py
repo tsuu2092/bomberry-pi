@@ -11,10 +11,9 @@ def valid_position_index(n):
 
 
 class Transform:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.color = color
 
     def get_position(self):
         return self.x, self.y
@@ -24,8 +23,8 @@ class Transform:
 
 
 class Player(Transform):
-    def __init__(self, _id=200, x=0, y=0, color = (0, 255, 0)):
-        super().__init__(x, y, color)
+    def __init__(self, _id=200, x=0, y=0):
+        super().__init__(x, y)
         self._id = _id
         self.bombs = []
         self.explosions = []
@@ -59,8 +58,8 @@ class Player(Transform):
 
 
 class Bomb(Transform):
-    def __init__(self, x, y , player, lifetime=2, length=2, color = (255, 0, 0)):
-        super().__init__(x, y, color)
+    def __init__(self, x, y, player, lifetime=2, length=2, ):
+        super().__init__(x, y)
         self.player = player
         self.is_triggered = False
         self.length = length
@@ -88,8 +87,8 @@ class Bomb(Transform):
 
 
 class Explosion(Transform):
-    def __init__(self, x, y, player, lifetime=0.1, color = (255, 0, 255)):
-        super().__init__(x, y, color)
+    def __init__(self, x, y, player, lifetime=0.1):
+        super().__init__(x, y)
         self.player = player
         self.end_time = time.time() + lifetime
 
@@ -103,8 +102,9 @@ class Explosion(Transform):
 sense = SenseHat()
 sense.clear()
 
-
-
+player_color = (0, 255, 0)
+bomb_color = (255, 0, 0)
+explosion_color = (255, 0, 255)
 player = Player()
 
 
@@ -134,17 +134,17 @@ def place_bomb(event):
 
 
 def render_player():
-    sense.set_pixel(player.x, player.y, player.color)
+    sense.set_pixel(player.x, player.y, player_color)
 
 
 def render_bombs():
     for bomb in player.bombs:
-        sense.set_pixel(bomb.x, bomb.y, bomb.color)
+        sense.set_pixel(bomb.x, bomb.y, bomb_color)
 
 
 def render_explosions():
     for explosion in player.explosions:
-        sense.set_pixel(explosion.x, explosion.y, explosion.color)
+        sense.set_pixel(explosion.x, explosion.y, explosion_color)
 
 
 def update():
