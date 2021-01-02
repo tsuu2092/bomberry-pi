@@ -47,9 +47,9 @@ class Map():
         self.enemy.handle_bombs()
         self.player.handle_explosions()
         self.enemy.handle_explosions()
-        self.player.invalid_positions = self.enemy.get_collider_positions() | self.player.get_collider_positions()
+        self.player.invalid_positions = self.enemy.get_collider_positions()
         self.player.dead_positions = self.enemy.get_explosion_positions()
-        self.enemy.invalid_positions = self.player.get_collider_positions() | self.player.get_collider_positions()
+        self.enemy.invalid_positions = self.player.get_collider_positions()
         self.enemy.dead_positions = self.player.get_explosion_positions()
         if self.player.is_hit():
             self.sense.show_message("You lose")
