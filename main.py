@@ -42,25 +42,39 @@ class Map():
         self.render(self.__class__.enemy_bomb_color, *self.enemy.bombs)
         self.render(self.__class__.enemy_explosion_color, *self.enemy.explosions)
 
+    def kill_display(self, color, transform):
+        for i in range(10):
+            self.sense.set_pixel(transform.x, transform.y, color)
+            time.sleep(0.2)
+            self.sense.set_pixel(transform.x, transform.y, (0,0,0))
+            time.sleep(0.2)
+
     def handle_all(self):
         self.player.handle_bombs()
         self.enemy.handle_bombs()
         self.player.handle_explosions()
         self.enemy.handle_explosions()
-        self.player.invalid_positions = self.enemy.get_collider_positions()
+        self.player.invalid_positions = self.enemy.get_collider_positions()|self.player.get_collider_positions()
         self.player.dead_positions = self.enemy.get_explosion_positions()
-        self.enemy.invalid_positions = self.player.get_collider_positions()
+        self.enemy.invalid_positions = self.player.get_collider_positions()|self.enemy.get_collider_positions()
         self.enemy.dead_positions = self.player.get_explosion_positions()
         if self.player.is_hit():
-            self.sense.show_message("You lose")
+            self.is_playing = False
+            self.kill_display(self.player_color, self.player)
+            while True:
+                self.sense.show_message("You lose")
             return
         if self.enemy.is_hit():
-            self.sense.show_message("You win")
+            self.is_playing = False
+            self.kill_display(self.enemy_color, self.enemy)
+            while True:
+                self.sense.show_message("You win")
             return
 
     def update(self):
-        self.handle_all()
-        self.render_all()
+        if self.is_playing:
+            self.handle_all()
+            self.render_all()
 
 
 class Transform:
