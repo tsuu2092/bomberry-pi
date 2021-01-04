@@ -61,14 +61,12 @@ class Map():
         if self.player.is_hit():
             self.is_playing = False
             self.kill_display(self.player_color, self.player)
-            while True:
-                self.sense.show_message("You lose")
+            self.sense.show_message("You lose")
             return
         if self.enemy.is_hit():
             self.is_playing = False
             self.kill_display(self.enemy_color, self.enemy)
-            while True:
-                self.sense.show_message("You win")
+            self.sense.show_message("You win")
             return
 
     def update(self):
