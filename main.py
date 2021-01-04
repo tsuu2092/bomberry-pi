@@ -58,6 +58,8 @@ class Map():
         self.player.dead_positions = self.enemy.get_explosion_positions()
         self.enemy.invalid_positions = self.player.get_collider_positions() | self.enemy.get_collider_positions()
         self.enemy.dead_positions = self.player.get_explosion_positions()
+
+    def check_hit_status(self):
         if self.player.is_hit():
             self.kill_display(self.player_color, self.player)
             self.sense.show_message("You lose")
@@ -70,6 +72,7 @@ class Map():
     def update(self):
         self.handle_all()
         self.render_all()
+        self.check_hit_status()
 
 
 class Transform:
