@@ -59,20 +59,17 @@ class Map():
         self.enemy.invalid_positions = self.player.get_collider_positions() | self.enemy.get_collider_positions()
         self.enemy.dead_positions = self.player.get_explosion_positions()
         if self.player.is_hit():
-            self.is_playing = False
             self.kill_display(self.player_color, self.player)
             self.sense.show_message("You lose")
             return
         if self.enemy.is_hit():
-            self.is_playing = False
             self.kill_display(self.enemy_color, self.enemy)
             self.sense.show_message("You win")
             return
 
     def update(self):
-        if self.is_playing:
-            self.handle_all()
-            self.render_all()
+        self.handle_all()
+        self.render_all()
 
 
 class Transform:
