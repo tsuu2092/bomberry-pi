@@ -230,4 +230,9 @@ def start_game(pos):
         _map.update()
 
 
+@sio.event
+def connect():
+    sio.emit('matchmaking')
+
+
 sio.connect(URL)
