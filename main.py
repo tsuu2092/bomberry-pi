@@ -1,5 +1,9 @@
 from sense_hat import SenseHat, ACTION_PRESSED
 import time
+import socketio
+
+sio = socketio.Client()
+URL = 'https://bomberrypi.herokuapp.com/'
 
 
 def clamp(n, _min=0, _max=7):
@@ -88,9 +92,8 @@ class Transform:
 
 
 class Player(Transform):
-    def __init__(self, _id=200, x=0, y=0):
+    def __init__(self, x=0, y=0):
         super().__init__(x, y)
-        self._id = _id
         self.bombs = []
         self.explosions = []
         self.invalid_positions = []
@@ -176,44 +179,60 @@ class Explosion(Transform):
         self.player.explosions.remove(self)
 
 
-sense = SenseHat()
-sense.clear()
+@sio.event
+def start_game(pos):
+    sense = SenseHat()
+    sense.clear()
+    player = Player(pos['x1'], pos['y1'])
+    enemy = Player(pos['x2'], pos['y2'])
+    _map = Map(sense, player, enemy)
 
-player = Player()
-enemy = Player(300, 2, 2)
-_map = Map(sense, player, enemy)
+    def move_up(event):
+        if event.action == ACTION_PRESSED:
+            player.move(0, -1)
+            sio.emit('move', {'x': 0, 'y': -1})
+
+    def move_down(event):
+        if event.action == ACTION_PRESSED:
+            player.move(0, 1)
+            sio.emit('move', {'x': 0, 'y': 1})
+
+    def move_left(event):
+        if event.action == ACTION_PRESSED:
+            player.move(-1, 0)
+            sio.emit('move', {'x': -1, 'y': 0})
+
+    def move_right(event):
+        if event.action == ACTION_PRESSED:
+            player.move(1, 0)
+            sio.emit('move', {'x': 1, 'y': 0})
+
+    def place_bomb(event):
+        if event.action == ACTION_PRESSED:
+            player.place_bomb()
+            sio.emit('place_bomb')
+
+    @sio.on('move')
+    def on_enemy_move(move):
+        enemy.move(move['x'], move['y'])
+
+    @sio.on('place_bomb')
+    def on_enemy_place_bomb():
+        enemy.place_bomb()
+
+    sense.stick.direction_up = move_up
+    sense.stick.direction_down = move_down
+    sense.stick.direction_left = move_left
+    sense.stick.direction_right = move_right
+    sense.stick.direction_middle = place_bomb
+
+    while True:
+        _map.update()
 
 
-def move_up(event):
-    if event.action == ACTION_PRESSED:
-        player.move(0, -1)
+@sio.event
+def connect():
+    sio.emit('matchmaking')
 
 
-def move_down(event):
-    if event.action == ACTION_PRESSED:
-        player.move(0, 1)
-
-
-def move_left(event):
-    if event.action == ACTION_PRESSED:
-        player.move(-1, 0)
-
-
-def move_right(event):
-    if event.action == ACTION_PRESSED:
-        player.move(1, 0)
-
-
-def place_bomb(event):
-    if event.action == ACTION_PRESSED:
-        player.place_bomb()
-
-
-sense.stick.direction_up = move_up
-sense.stick.direction_down = move_down
-sense.stick.direction_left = move_left
-sense.stick.direction_right = move_right
-sense.stick.direction_middle = place_bomb
-
-while True:
-    _map.update()
+sio.connect(URL)
