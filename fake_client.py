@@ -1,7 +1,7 @@
 import socketio
 
 sio = socketio.Client()
-URL = 'https://bomberrypi.herokuapp.com/socket.io'
+URL = 'https://bomberrypi.herokuapp.com/'
 
 
 @sio.event

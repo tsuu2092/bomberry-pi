@@ -73,6 +73,8 @@ class Map():
             self.kill_display(self.enemy_color, self.enemy)
             self.sense.show_message("You win")
             return
+        self.player.reset()
+        self.enemy.reset()
 
     def update(self):
         self.handle_all()
@@ -95,6 +97,12 @@ class Transform:
 class Player(Transform):
     def __init__(self, x=0, y=0):
         super().__init__(x, y)
+        self.bombs = []
+        self.explosions = []
+        self.invalid_positions = []
+        self.dead_positions = []
+
+    def reset(self):
         self.bombs = []
         self.explosions = []
         self.invalid_positions = []
