@@ -27,7 +27,6 @@ class Map():
         self.sense = sense
         self.player = player
         self.enemy = enemy
-        self.enemy.place_bomb()
         self.clear()
 
     def clear(self):
