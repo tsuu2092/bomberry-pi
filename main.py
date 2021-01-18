@@ -4,6 +4,8 @@ import socketio
 
 sio = socketio.Client()
 URL = 'https://bomberrypi.herokuapp.com/'
+sense = SenseHat()
+sense.clear()
 
 
 def clamp(n, _min=0, _max=7):
@@ -180,7 +182,6 @@ class Explosion(Transform):
 
 @sio.event
 def start_game(pos):
-    sense = SenseHat()
     sense.clear()
     player = Player(pos['x1'], pos['y1'])
     enemy = Player(pos['x2'], pos['y2'])
@@ -230,9 +231,15 @@ def start_game(pos):
         time.sleep(0.2)
 
 
+red = (255, 0, 0)
+green = (0, 255, 0)
+
+
 @sio.event
 def connect():
+    sense.set_pixel(4, 4, green)
     sio.emit('matchmaking')
 
 
+sense.set_pixel(4, 4, red)
 sio.connect(URL)
