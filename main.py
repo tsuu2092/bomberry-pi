@@ -217,3 +217,4 @@ sense.stick.direction_middle = place_bomb
 
 while True:
     _map.update()
+    time.sleep(0.2)
