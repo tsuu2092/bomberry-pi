@@ -227,7 +227,7 @@ def start_game(pos):
 
     while True:
         _map.update()
-        time.sleep(0.1)
+        time.sleep(0.2)
 
 
 @sio.event
