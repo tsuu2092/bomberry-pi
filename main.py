@@ -68,13 +68,16 @@ class Map():
         if self.player.is_hit():
             self.kill_display(self.player_color, self.player)
             self.sense.show_message("You lose")
+            self.player.reset()
+            self.enemy.reset()
             return
         if self.enemy.is_hit():
             self.kill_display(self.enemy_color, self.enemy)
             self.sense.show_message("You win")
+            self.player.reset()
+            self.enemy.reset()
             return
-        self.player.reset()
-        self.enemy.reset()
+
 
     def update(self):
         self.handle_all()
