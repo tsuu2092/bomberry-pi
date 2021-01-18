@@ -6,6 +6,7 @@ URL = 'https://bomberrypi.herokuapp.com/socket.io'
 
 @sio.event
 def connect():
+    print("Connect to server")
     sio.emit('matchmaking')
 
 
