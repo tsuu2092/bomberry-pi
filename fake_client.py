@@ -8,14 +8,14 @@ URL = 'https://bomberrypi.herokuapp.com/'
 def connect():
     print("Connect to server")
     sio.emit('matchmaking')
-    while True:
-        x, y = map(int, input("Your move: ").split())
-        sio.emit('move', {'x': x, 'y': y})
 
 
 @sio.event()
 def start_game(pos):
     print(pos)
+    while True:
+        x, y = map(int, input("Your move: ").split())
+        sio.emit('move', {'x': x, 'y': y})
 
 
 sio.connect(URL)
