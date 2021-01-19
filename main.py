@@ -48,7 +48,7 @@ class Map():
         self.render(self.__class__.enemy_explosion_color, *self.enemy.explosions)
 
     def kill_display(self, color, transform):
-        for i in range(10):
+        for i in range(5):
             self.sense.set_pixel(transform.x, transform.y, color)
             time.sleep(0.2)
             self.sense.set_pixel(transform.x, transform.y, (0, 0, 0))
@@ -66,18 +66,22 @@ class Map():
 
     def check_hit_status(self):
         if self.player.is_hit():
+            self.enemy.score += 1
             self.kill_display(self.player_color, self.player)
-            self.sense.show_message("You lose")
+            self.display_score()
             self.player.reset()
             self.enemy.reset()
             return
         if self.enemy.is_hit():
+            self.player.score += 1
             self.kill_display(self.enemy_color, self.enemy)
-            self.sense.show_message("You win")
+            self.display_score()
             self.player.reset()
             self.enemy.reset()
             return
 
+    def display_score(self):
+        self.sense.show_message(f"{self.player.score} - {self.enemy.score}")
 
     def update(self):
         self.handle_all()
@@ -100,6 +104,7 @@ class Transform:
 class Player(Transform):
     def __init__(self, x=0, y=0):
         super().__init__(x, y)
+        self.score = 0
         self.bombs = []
         self.explosions = []
         self.invalid_positions = []
@@ -201,22 +206,22 @@ def start_game(pos):
     def move_up(event):
         if event.action == ACTION_PRESSED:
             player.move(0, -1)
-            sio.emit('move', {'x': 0, 'y': -1})
+            sio.emit('move', {'x': player.x, 'y': player.y})
 
     def move_down(event):
         if event.action == ACTION_PRESSED:
             player.move(0, 1)
-            sio.emit('move', {'x': 0, 'y': 1})
+            sio.emit('move', {'x': player.x, 'y': player.y})
 
     def move_left(event):
         if event.action == ACTION_PRESSED:
             player.move(-1, 0)
-            sio.emit('move', {'x': -1, 'y': 0})
+            sio.emit('move', {'x': player.x, 'y': player.y})
 
     def move_right(event):
         if event.action == ACTION_PRESSED:
             player.move(1, 0)
-            sio.emit('move', {'x': 1, 'y': 0})
+            sio.emit('move', {'x': player.x, 'y': player.y})
 
     def place_bomb(event):
         if event.action == ACTION_PRESSED:
@@ -225,7 +230,8 @@ def start_game(pos):
 
     @sio.on('move')
     def on_enemy_move(move):
-        enemy.move(move['x'], move['y'])
+        enemy.x = move['x']
+        enemy.y = move['y']
 
     @sio.on('place_bomb')
     def on_enemy_place_bomb():
