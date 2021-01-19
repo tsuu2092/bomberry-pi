@@ -97,6 +97,9 @@ class Transform:
     def get_position(self):
         return self.x, self.y
 
+    def get_position_packet(self):
+        return {'x': self.x, 'y': self.y}
+
     def is_collided_with(self, transform):
         return self.get_position() == transform.get_position()
 
@@ -206,22 +209,22 @@ def start_game(pos):
     def move_up(event):
         if event.action == ACTION_PRESSED:
             player.move(0, -1)
-            sio.emit('move', {'x': player.x, 'y': player.y})
+            sio.emit('move', player.get_position_packet())
 
     def move_down(event):
         if event.action == ACTION_PRESSED:
             player.move(0, 1)
-            sio.emit('move', {'x': player.x, 'y': player.y})
+            sio.emit('move', player.get_position_packet())
 
     def move_left(event):
         if event.action == ACTION_PRESSED:
             player.move(-1, 0)
-            sio.emit('move', {'x': player.x, 'y': player.y})
+            sio.emit('move', player.get_position_packet())
 
     def move_right(event):
         if event.action == ACTION_PRESSED:
             player.move(1, 0)
-            sio.emit('move', {'x': player.x, 'y': player.y})
+            sio.emit('move', player.get_position_packet())
 
     def place_bomb(event):
         if event.action == ACTION_PRESSED:

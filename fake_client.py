@@ -18,4 +18,9 @@ def start_game(pos):
         sio.emit('move', {'x': x, 'y': y})
 
 
+@sio.event()
+def move(pos):
+    print(pos)
+
+
 sio.connect(URL)
