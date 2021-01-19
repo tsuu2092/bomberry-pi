@@ -66,19 +66,25 @@ class Map():
 
     def check_hit_status(self):
         if self.player.is_hit():
-            self.enemy.score += 1
-            self.kill_display(self.player_color, self.player)
-            self.display_score()
-            self.player.reset()
-            self.enemy.reset()
+            self.player_die()
+            sio.emit('die')
             return
-        if self.enemy.is_hit():
-            self.player.score += 1
-            self.kill_display(self.enemy_color, self.enemy)
-            self.display_score()
-            self.player.reset()
-            self.enemy.reset()
-            return
+        # if self.enemy.is_hit():
+        #     return
+
+    def player_die(self):
+        self.enemy.score += 1
+        self.kill_display(self.player_color, self.player)
+        self.display_score()
+        self.player.reset()
+        self.enemy.reset()
+
+    def enemy_die(self):
+        self.player.score += 1
+        self.kill_display(self.enemy_color, self.enemy)
+        self.display_score()
+        self.player.reset()
+        self.enemy.reset()
 
     def display_score(self):
         self.sense.show_message(str(self.player.score) + '-' + str(self.enemy.score))
@@ -240,6 +246,9 @@ def start_game(pos):
     def on_enemy_place_bomb():
         enemy.place_bomb()
 
+    @sio.on('die')
+    def on_enemy_die():
+        _map.enemy_die()
     sense.stick.direction_up = move_up
     sense.stick.direction_down = move_down
     sense.stick.direction_left = move_left
