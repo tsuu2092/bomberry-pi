@@ -81,7 +81,7 @@ class Map():
             return
 
     def display_score(self):
-        self.sense.show_message(f"{self.player.score} - {self.enemy.score}")
+        self.sense.show_message(str(self.player.score) + ' - ' + str(self.enemy.score))
 
     def update(self):
         self.handle_all()
