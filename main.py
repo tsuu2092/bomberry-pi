@@ -21,8 +21,8 @@ class Map():
     player_bomb_color = (0, 255, 255)
     player_explosion_color = (0, 0, 255)
     enemy_color = (125, 0, 0)
-    enemy_bomb_color = (255, 0, 0)
-    enemy_explosion_color = (255, 255, 0)
+    enemy_bomb_color = (255, 255, 0)
+    enemy_explosion_color = (255, 0, 255)
 
     def __init__(self, sense, player, enemy):
         self.is_playing = True
