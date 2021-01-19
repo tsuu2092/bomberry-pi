@@ -33,19 +33,20 @@ def start_game(pos):
     print(pos)
     player = Player(pos['x1'], pos['y1'])
     while True:
-        if keyboard.is_pressed('a'):
+        cmd = input()
+        if cmd == 'a':
             player.move(-1, 0)
             sio.emit('move', player.get_position_packet())
-        if keyboard.is_pressed('d'):
+        if cmd == 'd':
             player.move(1, 0)
             sio.emit('move', player.get_position_packet())
-        if keyboard.is_pressed('w'):
+        if cmd == 'w':
             player.move(0, -1)
             sio.emit('move', player.get_position_packet())
-        if keyboard.is_pressed('s'):
+        if cmd == 's':
             player.move(0, 1)
             sio.emit('move', player.get_position_packet())
-        if keyboard.is_pressed('j'):
+        if cmd == 'j':
             sio.emit('place_bomb')
 
 
