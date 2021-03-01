@@ -44,7 +44,8 @@ If there are two Pis running, they will be matchmade into the same game
 |:--:| 
 | *Connecting to server* |
 
-
 |![Gameplay](Screenshots/gameplay.png)|
 |:--:| 
 | *Gameplay* |
+
+[Demo video](https://youtu.be/q8A4-A5a5ho)
