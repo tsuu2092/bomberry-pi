@@ -42,10 +42,12 @@ If there are two Pis running, they will be matchmade into the same game
 
 |![Connected to server](Screenshots/connected.png)|
 |:--:| 
-| *Connecting to server* |
+| *Connected to server* |
 
 |![Gameplay](Screenshots/gameplay.png)|
 |:--:| 
 | *Gameplay* |
 
-[Demo video](https://youtu.be/q8A4-A5a5ho)
+## Demo video
+
+[Link](https://youtu.be/q8A4-A5a5ho)
